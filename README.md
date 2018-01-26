@@ -2,11 +2,11 @@
 
 Lietuviška kriptovaliuta
 
-* Reikia
+## Reikia
 
 cmake build-essential pkg-config libboost-all-dev libssl-dev libzmq3-dev libsodium-dev libreadline6-dev git
 
-* Diegimas
+## Diegimas
 
 git clone https://github.com/Bitlitas/bitlitas.git
 
@@ -20,7 +20,7 @@ cd build/release/bin
 
 Daugiau informacijos: --help
 
-* Nauja piniginė
+## Nauja piniginė
 
 Veikiant jungčiai piniginė yra bitlitas-wallet-cli failas
 
@@ -36,7 +36,7 @@ Daugiau informacijos: --help
 
 Nepamirškite išsisaugoti žodžių paslapties ir rakto.
 
-* Jeigų trūksta RAM buildinimui
+## Jeigų trūksta RAM buildinimui
 
 Sukuriame 2 GB swap failą:
 sudo fallocate -l 2G /swapfile

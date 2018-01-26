@@ -28,7 +28,7 @@ Rašome norėdami susikurti naują piniginę:
  ./bitlitas-wallet-cli --generate-new-wallet=piniginesPavadinimas.bin
 
 Atverti jau sukurtą:
-./bitlitas-wallet-cli --walelt=piniginesPavadinimas.bin
+./bitlitas-wallet-cli --wallet=piniginesPavadinimas.bin
 
 Norėdami pradėti kasti, rašome start_mining [branduolių skaičius]
 

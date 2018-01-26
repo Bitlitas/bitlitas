@@ -40,8 +40,11 @@ Nepamirškite išsisaugoti žodžių paslapties ir rakto.
 
 Sukuriame 2 GB swap failą:
 sudo fallocate -l 2G /swapfile
+
 sudo chmod 600 /swapfile
+
 sudo mkswap /swapfile
 
 Norėdami uždėti failą, kaip SWAP RAM:
+
 sudo swapon /swapfile

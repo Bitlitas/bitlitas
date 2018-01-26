@@ -1,0 +1,106 @@
+# Copyright (c) 2018, Bitlitas
+# All rights reserved. Based on Cryptonote and Monero.
+
+# include (${PROJECT_SOURCE_DIR}/cmake/libutils.cmake)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+set(wallet_sources
+  wallet2.cpp
+  wallet_args.cpp
+  node_rpc_proxy.cpp)
+
+set(wallet_private_headers
+  wallet2.h
+  wallet_args.h
+  wallet_errors.h
+  wallet_rpc_server.h
+  wallet_rpc_server_commands_defs.h
+  wallet_rpc_server_error_codes.h
+  node_rpc_proxy.h)
+
+bitlitas_private_headers(wallet
+  ${wallet_private_headers})
+bitlitas_add_library(wallet
+  ${wallet_sources}
+  ${wallet_private_headers})
+target_link_libraries(wallet
+  PUBLIC
+    multisig
+    common
+    cryptonote_core
+    mnemonics
+    ${Boost_CHRONO_LIBRARY}
+    ${Boost_SERIALIZATION_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
+    ${Boost_REGEX_LIBRARY}
+  PRIVATE
+    ${EXTRA_LIBRARIES})
+
+set(wallet_rpc_sources
+  wallet_rpc_server.cpp)
+
+set(wallet_rpc_headers)
+
+set(wallet_rpc_private_headers
+  wallet_rpc_server.h)
+
+bitlitas_private_headers(wallet_rpc_server
+  ${wallet_rpc_private_headers})
+bitlitas_add_executable(wallet_rpc_server
+  ${wallet_rpc_sources}
+  ${wallet_rpc_headers}
+  ${wallet_rpc_private_headers})
+
+target_link_libraries(wallet_rpc_server
+  PRIVATE
+    wallet
+    epee
+    rpc_base
+    cryptonote_core
+    cncrypto
+    common
+    version
+    ${Boost_CHRONO_LIBRARY}
+    ${Boost_PROGRAM_OPTIONS_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${EXTRA_LIBRARIES})
+set_property(TARGET wallet_rpc_server
+  PROPERTY
+    OUTPUT_NAME "bitlitas-wallet-rpc")
+install(TARGETS wallet_rpc_server DESTINATION bin)
+
+
+# build and install libwallet_merged only if we building for GUI
+if (BUILD_GUI_DEPS)
+    set(libs_to_merge
+            wallet_api
+            wallet
+            multisig
+            cryptonote_core
+            cryptonote_basic
+            mnemonics
+            common
+            cncrypto
+            ringct
+            checkpoints
+            version)
+
+    foreach(lib ${libs_to_merge})
+        list(APPEND objlibs $<TARGET_OBJECTS:obj_${lib}>) # matches naming convention in src/CMakeLists.txt
+    endforeach()
+    add_library(wallet_merged STATIC ${objlibs})
+    if(IOS)
+        set(lib_folder lib-${ARCH})
+    else()
+        set(lib_folder lib)
+    endif()
+    install(TARGETS wallet_merged
+        ARCHIVE DESTINATION ${lib_folder})
+
+    add_subdirectory(api)
+endif()

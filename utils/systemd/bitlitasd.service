@@ -1,0 +1,21 @@
+[Unit]
+Description=Bitlitas Full Node
+After=network.target
+
+[Service]
+User=bitlitas
+Group=bitlitas
+WorkingDirectory=~
+RuntimeDirectory=bitlitas
+
+Type=forking
+PIDFile=/run/bitlitas/bitlitasd.pid
+
+ExecStart=/usr/bin/bitlitasd --config-file /etc/bitlitasd.conf \
+    --detach --pidfile /run/bitlitas/bitlitasd.pid
+
+Restart=always
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

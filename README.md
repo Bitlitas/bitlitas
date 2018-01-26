@@ -39,6 +39,7 @@ Nepamirškite išsisaugoti žodžių paslapties ir rakto.
 ## Jeigų trūksta RAM buildinimui
 
 Sukuriame 2 GB swap failą:
+
 sudo fallocate -l 2G /swapfile
 
 sudo chmod 600 /swapfile

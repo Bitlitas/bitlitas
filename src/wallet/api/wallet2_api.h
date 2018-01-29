@@ -79,6 +79,12 @@ struct UnsignedTransaction
         Status_Critical
     };
 
+    enum Priority {
+        Priority_Low    = Bitlitas::UnsignedTransaction::Priority_Low,
+        Priority_Medium = Bitlitas::UnsignedTransaction::Priority_Medium,
+        Priority_High   = Bitlitas::UnsignedTransaction::Priority_High
+    };
+
     virtual ~UnsignedTransaction() = 0;
     virtual int status() const = 0;
     virtual std::string errorString() const = 0;

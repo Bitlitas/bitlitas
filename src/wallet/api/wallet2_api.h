@@ -80,9 +80,11 @@ struct UnsignedTransaction
     };
 
     enum Priority {
-        Priority_Low    = Bitlitas::UnsignedTransaction::Priority_Low,
-        Priority_Medium = Bitlitas::UnsignedTransaction::Priority_Medium,
-        Priority_High   = Bitlitas::UnsignedTransaction::Priority_High
+        Priority_Default = 0,
+        Priority_Low = 1,
+        Priority_Medium = 2,
+        Priority_High = 3,
+        Priority_Last
     };
 
     virtual ~UnsignedTransaction() = 0;

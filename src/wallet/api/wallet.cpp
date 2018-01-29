@@ -1565,6 +1565,25 @@ bool WalletImpl::checkSpendProof(const std::string &txid_str, const std::string 
     }
 }
 
+std::string WalletImpl::getReserveProof(bool all, uint32_t account_index, uint64_t amount, const std::string &message) const {
+    try
+    {
+        m_status = Status_Ok;
+        boost::optional<std::pair<uint32_t, uint64_t>> account_minreserve;
+        if (!all)
+        {
+            account_minreserve = std::make_pair(account_index, amount);
+        }
+        return m_wallet->get_reserve_proof(account_minreserve, message);
+    }
+    catch (const std::exception &e)
+    {
+        m_status = Status_Error;
+        m_errorString = e.what();
+        return "";
+    }
+}
+
 bool WalletImpl::checkReserveProof(const std::string &address, const std::string &message, const std::string &signature, bool &good, uint64_t &total, uint64_t &spent) const {
     cryptonote::address_parse_info info;
     if (!cryptonote::get_account_address_from_str(info, m_wallet->testnet(), address))

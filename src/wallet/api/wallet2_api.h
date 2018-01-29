@@ -43,6 +43,7 @@ struct PendingTransaction
     };
 
     enum Priority {
+        Priority_Default = 0,
         Priority_Low = 1,
         Priority_Medium = 2,
         Priority_High = 3,
@@ -76,13 +77,6 @@ struct UnsignedTransaction
         Status_Ok,
         Status_Error,
         Status_Critical
-    };
-
-    enum Priority {
-        Priority_Low = 1,
-        Priority_Medium = 2,
-        Priority_High = 3,
-        Priority_Last
     };
 
     virtual ~UnsignedTransaction() = 0;
@@ -679,6 +673,12 @@ struct Wallet
     virtual bool checkTxProof(const std::string &txid, const std::string &address, const std::string &message, const std::string &signature, bool &good, uint64_t &received, bool &in_pool, uint64_t &confirmations) = 0;
     virtual std::string getSpendProof(const std::string &txid, const std::string &message) const = 0;
     virtual bool checkSpendProof(const std::string &txid, const std::string &message, const std::string &signature, bool &good) const = 0;
+    /*!
+     * \brief getReserveProof - Generates a proof that proves the reserve of unspent funds
+     *                          Parameters `account_index` and `amount` are ignored when `all` is true
+     */
+    virtual std::string getReserveProof(bool all, uint32_t account_index, uint64_t amount, const std::string &message) const = 0;
+    virtual bool checkReserveProof(const std::string &address, const std::string &message, const std::string &signature, bool &good, uint64_t &total, uint64_t &spent) const = 0;
 
     /*
      * \brief signMessage - sign a message with the spend private key
@@ -722,7 +722,7 @@ struct WalletManager
      * \brief  Creates new wallet
      * \param  path           Name of wallet file
      * \param  password       Password of wallet file
-     * \param  language       Language to be used to generate electrum seed memo
+     * \param  language       Language to be used to generate electrum seed mnemonic
      * \return                Wallet instance (Wallet::status() needs to be called to check if created successfully)
      */
     virtual Wallet * createWallet(const std::string &path, const std::string &password, const std::string &language, bool testnet = false) = 0;
@@ -736,16 +736,30 @@ struct WalletManager
     virtual Wallet * openWallet(const std::string &path, const std::string &password, bool testnet = false) = 0;
 
     /*!
-     * \brief  recovers existing wallet using memo (electrum seed)
+     * \brief  recovers existing wallet using mnemonic (electrum seed)
      * \param  path           Name of wallet file to be created
-     * \param  memo           memo (25 words electrum seed)
+     * \param  password       Password of wallet file
+     * \param  mnemonic       mnemonic (25 words electrum seed)
      * \param  testnet        testnet
      * \param  restoreHeight  restore from start height
      * \return                Wallet instance (Wallet::status() needs to be called to check if recovered successfully)
      */
-    virtual Wallet * recoveryWallet(const std::string &path, const std::string &memo, bool testnet = false, uint64_t restoreHeight = 0) = 0;
+    virtual Wallet * recoveryWallet(const std::string &path, const std::string &password, const std::string &mnemonic,
+                                    bool testnet = false, uint64_t restoreHeight = 0) = 0;
+
+    /*!
+     * \deprecated this method creates a wallet WITHOUT a passphrase, use the alternate recoverWallet() method
+     * \brief  recovers existing wallet using mnemonic (electrum seed)
+     * \param  path           Name of wallet file to be created
+     * \param  mnemonic       mnemonic (25 words electrum seed)
+     * \param  testnet        testnet
+     * \param  restoreHeight  restore from start height
+     * \return                Wallet instance (Wallet::status() needs to be called to check if recovered successfully)
+     */
+    virtual Wallet * recoveryWallet(const std::string &path, const std::string &mnemonic, bool testnet = false, uint64_t restoreHeight = 0) = 0;
 
    /*!
+    * \deprecated this method creates a wallet WITHOUT a passphrase, use createWalletFromKeys(..., password, ...) instead
     * \brief  recovers existing wallet using keys. Creates a view only wallet if spend key is omitted
     * \param  path           Name of wallet file to be created
     * \param  language       language

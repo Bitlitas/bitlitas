@@ -987,8 +987,8 @@ Cette transaction sera déverrouillée au bloc %llu, dans approximativement %s j
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="711"/>
-        <source>donate [&lt;mixin_count&gt;] &lt;amount&gt; [payment_id] - Donate &lt;amount&gt; to the development team (donate.getbitlitas.org)</source>
-        <translation>donate [&lt;mixin&gt;] &lt;montant&gt; [ID_paiement] - Donner &lt;montant&gt; à l&apos;équipe de développement (donate.getbitlitas.org)</translation>
+        <source>donate [&lt;mixin_count&gt;] &lt;amount&gt; [payment_id] - Donate &lt;amount&gt; to the development team (donate.bitlitas.lt)</source>
+        <translation>donate [&lt;mixin&gt;] &lt;montant&gt; [ID_paiement] - Donner &lt;montant&gt; à l&apos;équipe de développement (donate.bitlitas.lt)</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="714"/>

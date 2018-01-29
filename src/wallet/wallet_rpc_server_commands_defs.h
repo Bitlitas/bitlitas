@@ -1087,6 +1087,7 @@ namespace wallet_rpc
     std::string type;
     uint64_t unlock_time;
     cryptonote::subaddress_index subaddr_index;
+    std::string address;
     bool double_spend_seen;
 
     BEGIN_KV_SERIALIZE_MAP()
@@ -1101,6 +1102,7 @@ namespace wallet_rpc
       KV_SERIALIZE(type);
       KV_SERIALIZE(unlock_time)
       KV_SERIALIZE(subaddr_index);
+      KV_SERIALIZE(address);
       KV_SERIALIZE(double_spend_seen)
     END_KV_SERIALIZE_MAP()
   };
@@ -1149,6 +1151,62 @@ namespace wallet_rpc
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(good)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+
+  struct COMMAND_RPC_GET_RESERVE_PROOF
+  {
+    struct request
+    {
+      bool all;
+      uint32_t account_index;     // ignored when `all` is true
+      uint64_t amount;            // ignored when `all` is true
+      std::string message;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(all)
+        KV_SERIALIZE(account_index)
+        KV_SERIALIZE(amount)
+        KV_SERIALIZE(message)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      std::string signature;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(signature)
+      END_KV_SERIALIZE_MAP()
+    };
+  };
+
+  struct COMMAND_RPC_CHECK_RESERVE_PROOF
+  {
+    struct request
+    {
+      std::string address;
+      std::string message;
+      std::string signature;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(address)
+        KV_SERIALIZE(message)
+        KV_SERIALIZE(signature)
+      END_KV_SERIALIZE_MAP()
+    };
+
+    struct response
+    {
+      bool good;
+      uint64_t total;
+      uint64_t spent;
+
+      BEGIN_KV_SERIALIZE_MAP()
+        KV_SERIALIZE(good)
+        KV_SERIALIZE(total)
+        KV_SERIALIZE(spent)
       END_KV_SERIALIZE_MAP()
     };
   };

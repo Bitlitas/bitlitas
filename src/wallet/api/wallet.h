@@ -32,7 +32,18 @@ public:
     bool createWatchOnly(const std::string &path, const std::string &password,
                             const std::string &language) const;
     bool open(const std::string &path, const std::string &password);
+    bool recover(const std::string &path,const std::string &password,
+                            const std::string &seed);
+    bool recoverFromKeysWithPassword(const std::string &path,
+                            const std::string &password,
+                            const std::string &language,
+                            const std::string &address_string,
+                            const std::string &viewkey_string,
+                            const std::string &spendkey_string = "");
+    // following two methods are deprecated since they create passwordless wallets
+    // use the two equivalent methods above
     bool recover(const std::string &path, const std::string &seed);
+    // deprecated: use recoverFromKeysWithPassword() instead
     bool recoverFromKeys(const std::string &path,
                             const std::string &language,
                             const std::string &address_string, 
@@ -115,6 +126,8 @@ public:
     virtual bool checkTxProof(const std::string &txid, const std::string &address, const std::string &message, const std::string &signature, bool &good, uint64_t &received, bool &in_pool, uint64_t &confirmations);
     virtual std::string getSpendProof(const std::string &txid, const std::string &message) const;
     virtual bool checkSpendProof(const std::string &txid, const std::string &message, const std::string &signature, bool &good) const;
+    virtual std::string getReserveProof(bool all, uint32_t account_index, uint64_t amount, const std::string &message) const;
+    virtual bool checkReserveProof(const std::string &address, const std::string &message, const std::string &signature, bool &good, uint64_t &total, uint64_t &spent) const;
     virtual std::string signMessage(const std::string &message);
     virtual bool verifySignedMessage(const std::string &message, const std::string &address, const std::string &signature) const;
     virtual void startRefresh();

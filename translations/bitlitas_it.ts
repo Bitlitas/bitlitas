@@ -957,8 +957,8 @@ Questa transazione verrà sbloccata al blocco %llu, in approssimativamente %s gi
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="711"/>
-        <source>donate [&lt;mixin_count&gt;] &lt;amount&gt; [payment_id] - Donate &lt;amount&gt; to the development team (donate.getbitlitas.org)</source>
-        <translation>donate [&lt;mixin_count&gt;] &lt;amount&gt; [payment_id] - Dona &lt;amount&gt; al team di sviluppo (donate.getbitlitas.org)</translation>
+        <source>donate [&lt;mixin_count&gt;] &lt;amount&gt; [payment_id] - Donate &lt;amount&gt; to the development team (donate.bitlitas.lt</source>
+        <translation>donate [&lt;mixin_count&gt;] &lt;amount&gt; [payment_id] - Dona &lt;amount&gt; al team di sviluppo (donate.bitlitas.lt)</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="714"/>

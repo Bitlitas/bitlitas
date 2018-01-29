@@ -228,10 +228,11 @@ namespace tools
     entry.timestamp = pd.m_timestamp;
     entry.amount = pd.m_amount;
     entry.unlock_time = pd.m_unlock_time;
-    entry.fee = 0; // TODO
+    entry.fee = pd.m_fee;
     entry.note = m_wallet->get_tx_note(pd.m_tx_hash);
     entry.type = "in";
     entry.subaddr_index = pd.m_subaddr_index;
+    entry.address = m_wallet->get_subaddress_as_str(pd.m_subaddr_index);
   }
   //------------------------------------------------------------------------------------------------------------------------------
   void wallet_rpc_server::fill_transfer_entry(tools::wallet_rpc::transfer_entry &entry, const crypto::hash &txid, const tools::wallet2::confirmed_transfer_details &pd)
@@ -257,6 +258,7 @@ namespace tools
 
     entry.type = "out";
     entry.subaddr_index = { pd.m_subaddr_account, 0 };
+    entry.address = m_wallet->get_subaddress_as_str({pd.m_subaddr_account, 0});
   }
   //------------------------------------------------------------------------------------------------------------------------------
   void wallet_rpc_server::fill_transfer_entry(tools::wallet_rpc::transfer_entry &entry, const crypto::hash &txid, const tools::wallet2::unconfirmed_transfer_details &pd)
@@ -275,6 +277,7 @@ namespace tools
     entry.note = m_wallet->get_tx_note(txid);
     entry.type = is_failed ? "failed" : "pending";
     entry.subaddr_index = { pd.m_subaddr_account, 0 };
+    entry.address = m_wallet->get_subaddress_as_str({pd.m_subaddr_account, 0});
   }
   //------------------------------------------------------------------------------------------------------------------------------
   void wallet_rpc_server::fill_transfer_entry(tools::wallet_rpc::transfer_entry &entry, const crypto::hash &payment_id, const tools::wallet2::pool_payment_details &ppd)
@@ -288,11 +291,12 @@ namespace tools
     entry.timestamp = pd.m_timestamp;
     entry.amount = pd.m_amount;
     entry.unlock_time = pd.m_unlock_time;
-    entry.fee = 0; // TODO
+    entry.fee = pd.m_fee;
     entry.note = m_wallet->get_tx_note(pd.m_tx_hash);
     entry.double_spend_seen = ppd.m_double_spend_seen;
     entry.type = "pool";
     entry.subaddr_index = pd.m_subaddr_index;
+    entry.address = m_wallet->get_subaddress_as_str(pd.m_subaddr_index);
   }
   //------------------------------------------------------------------------------------------------------------------------------
   bool wallet_rpc_server::on_getbalance(const wallet_rpc::COMMAND_RPC_GET_BALANCE::request& req, wallet_rpc::COMMAND_RPC_GET_BALANCE::response& res, epee::json_rpc::error& er)
@@ -756,7 +760,8 @@ namespace tools
     try
     {
       uint64_t mixin = m_wallet->adjust_mixin(req.mixin);
-      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_2(dsts, mixin, req.unlock_time, req.priority, extra, req.account_index, req.subaddr_indices, m_trusted_daemon);
+      uint32_t priority = m_wallet->adjust_priority(req.priority);
+      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_2(dsts, mixin, req.unlock_time, priority, extra, req.account_index, req.subaddr_indices, m_trusted_daemon);
 
       if (ptx_vector.empty())
       {
@@ -807,8 +812,9 @@ namespace tools
     try
     {
       uint64_t mixin = m_wallet->adjust_mixin(req.mixin);
+      uint32_t priority = m_wallet->adjust_priority(req.priority);
       LOG_PRINT_L2("on_transfer_split calling create_transactions_2");
-      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_2(dsts, mixin, req.unlock_time, req.priority, extra, req.account_index, req.subaddr_indices, m_trusted_daemon);
+      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_2(dsts, mixin, req.unlock_time, priority, extra, req.account_index, req.subaddr_indices, m_trusted_daemon);
       LOG_PRINT_L2("on_transfer_split called create_transactions_2");
 
       return fill_response(ptx_vector, req.get_tx_keys, res.tx_key_list, res.amount_list, res.fee_list, res.multisig_txset, req.do_not_relay,
@@ -873,7 +879,8 @@ namespace tools
     try
     {
       uint64_t mixin = m_wallet->adjust_mixin(req.mixin);
-      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_all(req.below_amount, dsts[0].addr, dsts[0].is_subaddress, mixin, req.unlock_time, req.priority, extra, req.account_index, req.subaddr_indices, m_trusted_daemon);
+      uint32_t priority = m_wallet->adjust_priority(req.priority);
+      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_all(req.below_amount, dsts[0].addr, dsts[0].is_subaddress, mixin, req.unlock_time, priority, extra, req.account_index, req.subaddr_indices, m_trusted_daemon);
 
       return fill_response(ptx_vector, req.get_tx_keys, res.tx_key_list, res.amount_list, res.fee_list, res.multisig_txset, req.do_not_relay,
           res.tx_hash_list, req.get_tx_hex, res.tx_blob_list, req.get_tx_metadata, res.tx_metadata_list, er);
@@ -920,7 +927,8 @@ namespace tools
     try
     {
       uint64_t mixin = m_wallet->adjust_mixin(req.mixin);
-      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_single(ki, dsts[0].addr, dsts[0].is_subaddress, mixin, req.unlock_time, req.priority, extra, m_trusted_daemon);
+      uint32_t priority = m_wallet->adjust_priority(req.priority);
+      std::vector<wallet2::pending_tx> ptx_vector = m_wallet->create_transactions_single(ki, dsts[0].addr, dsts[0].is_subaddress, mixin, req.unlock_time, priority, extra, m_trusted_daemon);
 
       if (ptx_vector.empty())
       {
@@ -1288,6 +1296,10 @@ namespace tools
       else if(req.key_type.compare("view_key") == 0)
       {
           res.key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key);
+      }
+      else if(req.key_type.compare("spend_key") == 0)
+      {
+          res.key = string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_spend_secret_key);
       }
       else
       {
@@ -1685,6 +1697,66 @@ namespace tools
     try
     {
       res.good = m_wallet->check_spend_proof(txid, req.message, req.signature);
+    }
+    catch (const std::exception &e)
+    {
+      er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
+      er.message = e.what();
+      return false;
+    }
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool wallet_rpc_server::on_get_reserve_proof(const wallet_rpc::COMMAND_RPC_GET_RESERVE_PROOF::request& req, wallet_rpc::COMMAND_RPC_GET_RESERVE_PROOF::response& res, epee::json_rpc::error& er)
+  {
+    if (!m_wallet) return not_open(er);
+
+    boost::optional<std::pair<uint32_t, uint64_t>> account_minreserve;
+    if (!req.all)
+    {
+      if (req.account_index >= m_wallet->get_num_subaddress_accounts())
+      {
+        er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
+        er.message = "Account index is out of bound";
+        return false;
+      }
+      account_minreserve = std::make_pair(req.account_index, req.amount);
+    }
+
+    try
+    {
+      res.signature = m_wallet->get_reserve_proof(account_minreserve, req.message);
+    }
+    catch (const std::exception &e)
+    {
+      er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
+      er.message = e.what();
+      return false;
+    }
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool wallet_rpc_server::on_check_reserve_proof(const wallet_rpc::COMMAND_RPC_CHECK_RESERVE_PROOF::request& req, wallet_rpc::COMMAND_RPC_CHECK_RESERVE_PROOF::response& res, epee::json_rpc::error& er)
+  {
+    if (!m_wallet) return not_open(er);
+
+    cryptonote::address_parse_info info;
+    if (!get_account_address_from_str(info, m_wallet->testnet(), req.address))
+    {
+      er.code = WALLET_RPC_ERROR_CODE_WRONG_ADDRESS;
+      er.message = "Invalid address";
+      return false;
+    }
+    if (info.is_subaddress)
+    {
+      er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
+      er.message = "Address must not be a subaddress";
+      return false;
+    }
+
+    try
+    {
+      res.good = m_wallet->check_reserve_proof(info.address, req.message, req.signature, res.total, res.spent);
     }
     catch (const std::exception &e)
     {

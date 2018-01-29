@@ -17,11 +17,14 @@
 #include "cryptonote_basic/cryptonote_basic_impl.h"
 #include "wallet/wallet2.h"
 #include "console_handler.h"
+#include "common/i18n.h"
 #include "common/password.h"
 #include "crypto/crypto.h"  // for definition of crypto::secret_key
 
 #undef BITLITAS_DEFAULT_LOG_CATEGORY
 #define BITLITAS_DEFAULT_LOG_CATEGORY "wallet.simplewallet"
+
+constexpr const char BITLITAS_DONATION_ADDR[] = "48s6r8VYQKUTrVvujtLxijTEzwCRyeW8PjF9aCAEeMGW1FLDJM2LhorEShbpbPRrxHANx3TKLT2mpaHybvKZLzC964iWHq6";
 
 /*!
  * \namespace cryptonote
@@ -99,7 +102,9 @@ namespace cryptonote
     bool set_merge_destinations(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_confirm_backlog(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_confirm_backlog_threshold(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_confirm_export_overwrite(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_refresh_from_block_height(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_auto_low_priority(const std::vector<std::string> &args = std::vector<std::string>());
     bool help(const std::vector<std::string> &args = std::vector<std::string>());
     bool start_mining(const std::vector<std::string> &args);
     bool stop_mining(const std::vector<std::string> &args);
@@ -143,6 +148,8 @@ namespace cryptonote
     bool check_tx_proof(const std::vector<std::string> &args);
     bool get_spend_proof(const std::vector<std::string> &args);
     bool check_spend_proof(const std::vector<std::string> &args);
+    bool get_reserve_proof(const std::vector<std::string> &args);
+    bool check_reserve_proof(const std::vector<std::string> &args);
     bool show_transfers(const std::vector<std::string> &args);
     bool unspent_outputs(const std::vector<std::string> &args);
     bool rescan_blockchain(const std::vector<std::string> &args);

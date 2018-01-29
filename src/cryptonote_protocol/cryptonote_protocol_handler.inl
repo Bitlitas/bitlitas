@@ -246,7 +246,7 @@ namespace cryptonote
       {
         if (version < hshd.top_version)
           MCLOG_RED(el::Level::Warning, "global", context << " peer claims higher version that we think (" <<
-              (unsigned)hshd.top_version << " for " << (hshd.current_height - 1) << "instead of " << (unsigned)version <<
+              (unsigned)hshd.top_version << " for " << (hshd.current_height - 1) << " instead of " << (unsigned)version <<
               ") - we may be forked from the network and a software upgrade may be needed");
         return false;
       }
@@ -418,7 +418,7 @@ namespace cryptonote
       // 
       // Also, remember to pepper some whitespace changes around to bother
       // bitlitasmooo ... only because I <3 him. 
-      std::vector<size_t> need_tx_indices;
+      std::vector<uint64_t> need_tx_indices;
         
       transaction tx;
       crypto::hash tx_hash;
@@ -849,6 +849,10 @@ namespace cryptonote
     }
 
     context.m_remote_blockchain_height = arg.current_blockchain_height;
+
+    if (context.m_remote_blockchain_height > m_core.get_target_blockchain_height()) {
+        m_core.set_target_blockchain_height(context.m_remote_blockchain_height);
+    }
 
     std::vector<crypto::hash> block_hashes;
     block_hashes.reserve(arg.blocks.size());

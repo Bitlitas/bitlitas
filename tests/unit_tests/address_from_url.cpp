@@ -7,6 +7,7 @@
 
 #include "wallet/wallet2.h"
 #include "common/dns_utils.h"
+#include "simplewallet/simplewallet.h"
 #include <string>
 
 TEST(AddressFromTXT, Success)
@@ -58,11 +59,11 @@ TEST(AddressFromTXT, Failure)
 
 TEST(AddressFromURL, Success)
 {
-  const std::string addr = "44AFFq5kSiGBoZ4NMDwYtN18obc8AemS33DBLWs3H7otXft3XjrpDtQGv7SqSsaBYBb98uNbr2VBBEt7f2wfn3RVGQBEP3A";
+  const std::string addr = BITLITAS_DONATION_ADDR;
   
   bool dnssec_result = false;
 
-  std::vector<std::string> addresses = tools::dns_utils::addresses_from_url("donate.getbitlitas.org", dnssec_result);
+  std::vector<std::string> addresses = tools::dns_utils::addresses_from_url("donate.bitlitas.lt", dnssec_result);
 
   EXPECT_EQ(1, addresses.size());
   if (addresses.size() == 1)
@@ -71,7 +72,7 @@ TEST(AddressFromURL, Success)
   }
 
   // OpenAlias address with an @ instead of first .
-  addresses = tools::dns_utils::addresses_from_url("donate@getbitlitas.org", dnssec_result);
+  addresses = tools::dns_utils::addresses_from_url("donate@bitlitas.lt", dnssec_result);
   EXPECT_EQ(1, addresses.size());
   if (addresses.size() == 1)
   {

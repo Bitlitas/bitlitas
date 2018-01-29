@@ -26,6 +26,13 @@ namespace rct {
         return proof;
     }
 
+    bool verBulletproof(const Bulletproof &proof)
+    {
+      try { return bulletproof_VERIFY(proof); }
+      // we can get deep throws from ge_frombytes_vartime if input isn't valid
+      catch (...) { return false; }
+    }
+
     //Borromean (c.f. gmax/andytoshi's paper)
     boroSig genBorromean(const key64 x, const key64 P1, const key64 P2, const bits indices) {
         key64 L[2], alpha;
@@ -619,7 +626,7 @@ namespace rct {
                 rv.p.rangeSigs[i] = proveRange(rv.outPk[i].mask, outSk[i].mask, amounts[i]);
             #ifdef DBG
             if (bulletproof)
-                CHECK_AND_ASSERT_THROW_MES(bulletproof_VERIFY(rv.p.bulletproofs[i]), "bulletproof_VERIFY failed on newly created proof");
+                CHECK_AND_ASSERT_THROW_MES(verBulletproof(rv.p.bulletproofs[i]), "verBulletproof failed on newly created proof");
             else
                 CHECK_AND_ASSERT_THROW_MES(verRange(rv.outPk[i].mask, rv.p.rangeSigs[i]), "verRange failed on newly created proof");
             #endif
@@ -699,7 +706,7 @@ namespace rct {
               rv.p.rangeSigs[i] = proveRange(rv.outPk[i].mask, outSk[i].mask, outamounts[i]);
             #ifdef DBG
             if (bulletproof)
-                CHECK_AND_ASSERT_THROW_MES(bulletproof_VERIFY(rv.p.bulletproofs[i]), "bulletproof_VERIFY failed on newly created proof");
+                CHECK_AND_ASSERT_THROW_MES(verBulletproof(rv.p.bulletproofs[i]), "verBulletproof failed on newly created proof");
             else
                 CHECK_AND_ASSERT_THROW_MES(verRange(rv.outPk[i].mask, rv.p.rangeSigs[i]), "verRange failed on newly created proof");
             #endif
@@ -791,7 +798,7 @@ namespace rct {
             for (size_t i = 0; i < rv.outPk.size(); i++) {
               tpool.submit(&waiter, [&, i] {
                 if (rv.p.rangeSigs.empty())
-                  results[i] = bulletproof_VERIFY(rv.p.bulletproofs[i]);
+                  results[i] = verBulletproof(rv.p.bulletproofs[i]);
                 else
                   results[i] = verRange(rv.outPk[i].mask, rv.p.rangeSigs[i]);
               });
@@ -887,7 +894,7 @@ namespace rct {
           for (size_t i = 0; i < rv.outPk.size(); i++) {
             tpool.submit(&waiter, [&, i] {
               if (rv.p.rangeSigs.empty())
-                results[i] = bulletproof_VERIFY(rv.p.bulletproofs[i]);
+                results[i] = verBulletproof(rv.p.bulletproofs[i]);
               else
                 results[i] = verRange(rv.outPk[i].mask, rv.p.rangeSigs[i]);
             });

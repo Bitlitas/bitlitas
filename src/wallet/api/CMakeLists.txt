@@ -53,6 +53,8 @@ target_link_libraries(wallet_api
   PRIVATE
     ${EXTRA_LIBRARIES})
 
+set_property(TARGET wallet_api PROPERTY EXCLUDE_FROM_ALL TRUE)
+set_property(TARGET obj_wallet_api PROPERTY EXCLUDE_FROM_ALL TRUE)
 
 if(IOS)
     set(lib_folder lib-${ARCH})
@@ -61,4 +63,4 @@ else()
 endif()
 
 install(FILES ${wallet_api_headers}
-    DESTINATION include/wallet)
+    DESTINATION include/wallet/api)

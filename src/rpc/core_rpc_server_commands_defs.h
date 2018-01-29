@@ -22,7 +22,7 @@ namespace cryptonote
 // advance which version they will stop working with
 // Don't go over 32767 for any of these
 #define CORE_RPC_VERSION_MAJOR 1
-#define CORE_RPC_VERSION_MINOR 17
+#define CORE_RPC_VERSION_MINOR 18
 #define MAKE_CORE_RPC_VERSION(major,minor) (((major)<<16)|(minor))
 #define CORE_RPC_VERSION MAKE_CORE_RPC_VERSION(CORE_RPC_VERSION_MAJOR, CORE_RPC_VERSION_MINOR)
 
@@ -809,7 +809,7 @@ namespace cryptonote
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(tx_as_hex)
-        KV_SERIALIZE(do_not_relay)
+        KV_SERIALIZE_OPT(do_not_relay, false)
       END_KV_SERIALIZE_MAP()
     };
 
@@ -899,6 +899,7 @@ namespace cryptonote
       std::string top_block_hash;
       uint64_t cumulative_difficulty;
       uint64_t block_size_limit;
+      uint64_t block_size_median;
       uint64_t start_time;
       uint64_t free_space;
       bool offline;
@@ -921,6 +922,7 @@ namespace cryptonote
         KV_SERIALIZE(top_block_hash)
         KV_SERIALIZE(cumulative_difficulty)
         KV_SERIALIZE(block_size_limit)
+        KV_SERIALIZE(block_size_median)
         KV_SERIALIZE(start_time)
         KV_SERIALIZE(free_space)
         KV_SERIALIZE(offline)
@@ -1626,8 +1628,8 @@ namespace cryptonote
     struct response
     {
       std::string status;
-      uint64_t limit_up;
-      uint64_t limit_down;
+      int64_t limit_up;
+      int64_t limit_down;
       
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(status)

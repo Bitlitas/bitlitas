@@ -72,7 +72,7 @@ static const uint64_t testnet_hard_fork_version_1_till = 0;
 
 //------------------------------------------------------------------
 Blockchain::Blockchain(tx_memory_pool& tx_pool) :
-  m_db(), m_tx_pool(tx_pool), m_hardfork(NULL), m_timestamps_and_difficulties_height(0), m_current_block_cumul_sz_limit(0),
+  m_db(), m_tx_pool(tx_pool), m_hardfork(NULL), m_timestamps_and_difficulties_height(0), m_current_block_cumul_sz_limit(0), m_current_block_cumul_sz_median(0),
   m_enforce_dns_checkpoints(false), m_max_prepare_blocks_threads(4), m_db_blocks_per_sync(1), m_db_sync_mode(db_async), m_db_default_sync(false), m_fast_sync(true), m_show_time_stats(false), m_sync_counter(0), m_cancel(false)
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
@@ -1030,6 +1030,12 @@ uint64_t Blockchain::get_current_cumulative_blocksize_limit() const
   LOG_PRINT_L3("Blockchain::" << __func__);
   return m_current_block_cumul_sz_limit;
 }
+//------------------------------------------------------------------
+uint64_t Blockchain::get_current_cumulative_blocksize_median() const
+ {
+  LOG_PRINT_L3("Blockchain::" << __func__);
+  return m_current_block_cumul_sz_median;
+ }
 //------------------------------------------------------------------
 //TODO: This function only needed minor modification to work with BlockchainDB,
 //      and *works*.  As such, to reduce the number of things that might break
@@ -2863,7 +2869,7 @@ bool Blockchain::check_fee(size_t blob_size, uint64_t fee) const
   needed_fee += (blob_size % 1024) ? 1 : 0;
   needed_fee *= fee_per_kb;
 
-  if (fee < needed_fee * 0.98) // keep a little buffer on acceptance
+  if (fee < needed_fee - needed_fee / 50) // keep a little 2% buffer on acceptance - no integer overflow
   {
     MERROR_VER("transaction fee is not enough: " << print_money(fee) << ", minimum fee: " << print_money(needed_fee));
     return false;
@@ -3448,6 +3454,7 @@ bool Blockchain::update_next_cumulative_size_limit()
   get_last_n_blocks_sizes(sz, CRYPTONOTE_REWARD_BLOCKS_WINDOW);
 
   uint64_t median = epee::misc_utils::median(sz);
+  m_current_block_cumul_sz_median = median;
   if(median <= full_reward_zone)
     median = full_reward_zone;
 

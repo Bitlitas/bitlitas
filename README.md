@@ -11,13 +11,9 @@ $ cmake build-essential pkg-config libboost-all-dev libssl-dev libzmq3-dev libso
 
 ```console
 $ git clone https://github.com/Bitlitas/bitlitas.git
-
 $ cd bitlitas
-
 $ make (arba make -j1 su vienų core jei mažai ramų)
-
 $ cd build/release/bin
-
 $ ./bitlitasd
 ```
 
@@ -56,9 +52,7 @@ Nepamirškite išsisaugoti žodžių paslapties ir rakto.
 Sukuriame 2 GB swap failą:
 ```console
 $ sudo fallocate -l 2G /swapfile
-
 $ sudo chmod 600 /swapfile
-
 $ sudo mkswap /swapfile
 ```
 Norėdami uždėti failą, kaip SWAP RAM:

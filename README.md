@@ -26,8 +26,10 @@ Daugiau informacijos: `--help`
 ### Mac OS X
 Sudiegiam brew for mac: https://brew.sh
 
-`sudo wget https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp -O /usr/local/include/zmq.hpp&&
-brew install boost --with-python zmq graphviz`
+```console
+$ sudo wget https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp -O /usr/local/include/zmq.hpp
+$ brew install boost --with-python zmq graphviz
+```
 
 ## Nauja piniginė
 

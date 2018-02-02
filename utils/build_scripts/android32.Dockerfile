@@ -82,7 +82,7 @@ RUN git clone https://github.com/zeromq/zeromq4-1.git \
 
 RUN ln -s /opt/android/openssl/libcrypto.a /opt/android/openssl/libssl.a ${TOOLCHAIN_DIR}/arm-linux-androideabi/lib/armv7-a
 
-RUN git clone https://NerijusVitkauskas@bitbucket.org/NerijusVitkauskas/bitlitas.git \
+RUN git clone https://github.com/Bitlitas/bitlitas.git \
     && cd bitlitas \
     && mkdir -p build/release \
     && CC=clang CXX=clang++ \

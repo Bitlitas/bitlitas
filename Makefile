@@ -41,7 +41,7 @@ release-all:
 
 release-static:
 	mkdir -p build/release
-	cd build/release && cmake -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=release ../.. && $(MAKE)
+	cd build/release && cmake -D CMAKE_LIBRARY_PATH=~/libzmq -D CMAKE_INCLUDE_PATH=~/cppzmq -D DEVELOPER_LOCAL_TOOLS=1 -D OPENSSL_ROOT_DIR=/usr/local/ssl -D BOOST_ROOT=~/boost_1_66_0 -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=release ../.. && $(MAKE)
 
 coverage:
 	mkdir -p build/debug

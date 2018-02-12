@@ -5,7 +5,7 @@ Lietuviška kriptovaliuta
 ## Reikia
 
 ```console
-$ cmake build-essential pkg-config libboost-all-dev libssl-dev libzmq3-dev libsodium-dev libreadline6-dev git
+$ cmake build-essential pkg-config libboost-all-dev libssl-dev libzmq3-dev libsodium-dev libreadline6-dev git libunbound-dev
 ```
 ## Diegimas
 
